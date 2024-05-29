@@ -1,11 +1,11 @@
-import Signup from './Pages/Signup'
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import router from './Routes/web'; // Make sure this path is correct
 
 function App() {
   return (
-    <>
-      <Signup></Signup>
-    </>
-  )
+    <RouterProvider router={router} />
+  );
 }
 
-export default App
+export default App;
