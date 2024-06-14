@@ -3,3 +3,12 @@
     color: white;
     width: 100%;
 }
+.without-underline-forgot {
+    text-decoration: none;
+    color: black;
+    width: 100%;
+    font-size: 18px;
+}
+.without-underline-forgot:hover {
+    text-decoration: underline;
+}

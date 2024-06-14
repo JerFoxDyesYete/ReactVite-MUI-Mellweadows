@@ -4,10 +4,21 @@ import Signup from '../Pages/Signup';
 import Login from '../Pages/Login';
 import Main from '../Pages/Main';
 import Dashboard from '../Pages/Dashboard';
+import Patient from '../Components/Patient';
+import Staff from '../Components/Staff';
+import Ward from '../Components/Ward';
+import Supply from '../Components/Supply';
+import PatientMain from '../Components/PatientMain';
+import WebPage from '../Pages/WebPage';
+import AddSupply from '../Components/AddSupply';
 
 const router = createBrowserRouter([
   {
     path: '/',
+    element: <WebPage/>
+  },
+  {
+    path: '/login',
     element: <Login/>
   },
   {
@@ -23,16 +34,28 @@ const router = createBrowserRouter([
             element: <Main />
         },
         {
-            path: "users",
-            element: <div>Users</div>
+            path: "patients",
+            element: <Patient/>
         },
         {
-            path: "reports",
-            element: <div>Reports</div>
+          path: 'patientsmain',
+          element: <PatientMain/>
         },
         {
-            path: "settings",
-            element: <div>Settings</div>
+            path: "staff",
+            element: <Staff/>
+        },
+        {
+            path: "ward",
+            element: <Ward/>
+        },
+        {
+            path: "supply",
+            element: <AddSupply/>
+        },
+        {
+            path: "supplylist",
+            element: <Supply/>
         }
     ]
   }

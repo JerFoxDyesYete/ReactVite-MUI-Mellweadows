@@ -1,0 +1,13 @@
+body{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    overflow-y: hidden;
+}
+/* style.css */
+.background {
+    background-image: url('../Pages/Images/Wallpaper.png');
+    background-size: cover;
+    background-position: center;
+  }
+  

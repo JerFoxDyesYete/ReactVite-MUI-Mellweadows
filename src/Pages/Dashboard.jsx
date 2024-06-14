@@ -12,10 +12,8 @@ import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { mainListItems } from '../Components/NavList';
 import Copyright from '../Components/Copyright';
@@ -33,6 +31,7 @@ const AppBar = styled(MuiAppBar, {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
     }),
+    backgroundColor: 'rgb(29, 94, 37)',
     ...(open && {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
@@ -113,13 +112,8 @@ export default function Dashboard() {
                             noWrap
                             sx={{ flexGrow: 1 }}
                         >
-                            Dashboard
+                            Wellmeadows Hospital
                         </Typography>
-                        <IconButton color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
                         <IconButton color="inherit" onClick={logout}>
                             <LogoutIcon />
                         </IconButton>
@@ -157,18 +151,16 @@ export default function Dashboard() {
                 >
                     <Toolbar />
                     {/* Main Content */}
-                    <Container maxWidth="false" sx={{ mt: 4, mb: 4 }}>
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <Paper sx={{ p: 4 }}>
-                                    <Outlet />
-                                </Paper>
+                    <Container maxWidth="false" sx={{ mt: 4, mb: 4, height: '100vh' }}>
+                        <Grid>  {/* Add spacing between Grid items */}
+                            <Grid item xs={4}>
+                                    <Outlet />  {/* Your first content */}
                             </Grid>
                         </Grid>
                         <Copyright sx={{ pt: 4 }} />
                     </Container>
-                    {/* End of Main Content */}
                 </Box>
+
             </Box>
         </ThemeProvider>
     );

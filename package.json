@@ -14,7 +14,11 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
+    "@mui/x-date-pickers": "^7.6.2",
     "@supabase/supabase-js": "^2.43.4",
+    "date-fns": "^3.6.0",
+    "dayjs": "^1.11.11",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.1"
