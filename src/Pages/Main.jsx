@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Snackbar, SnackbarContent, Alert } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -17,6 +17,10 @@ function Main() {
   const [totalStaff, setTotalStaff] = useState(0);
   const [patients, setPatients] = useState([]);
   const [waitingList, setWaitingList] = useState([]);
+  const [wardCapacities, setWardCapacities] = useState({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const wardNames = ['ICU', 'Orthopedic', 'Pediatrics', 'Emergency', 'NICU', 'Maternity', 'Surgical', 'Medical', 'Cardiology', 'Oncology', 'Psychiatric', 'Burn Unit', 'Neurology', 'Geriatric', 'Rehabilitation', 'Isolation', 'Hematology'];
   const maxWardCapacity = 240;
 
   useEffect(() => {
@@ -24,6 +28,7 @@ function Main() {
     fetchTotalPatients();
     fetchPatients();
     fetchWaitingList();
+    fetchWardCapacities();
   }, []);
 
   const fetchTotalPatients = async () => {
@@ -79,9 +84,43 @@ function Main() {
     }
   };
 
+  const fetchWardCapacities = async () => {
+    try {
+      // Fetch or initialize ward capacities based on your application's logic
+      const capacities = {
+        1: 15,
+        2: 14,
+        3: 14,
+        4: 14,
+        5: 14,
+        6: 14,
+        7: 14,
+        8: 14,
+        9: 14,
+        10: 14,
+        11: 14,
+        12: 14,
+        13: 14,
+        14: 14,
+        15: 14,
+        16: 14,
+        17: 14,
+      };
+      setWardCapacities(capacities);
+    } catch (error) {
+      console.error('Error fetching ward capacities:', error.message);
+    }
+  };
+
   const remainingCapacity = maxWardCapacity - totalPatients;
 
   const handleInPatient = async (patientId) => {
+    const patient = waitingList.find(p => p.patient_id === patientId);
+    if (!patient.ward_num) {
+      setSnackbarMessage('Select a ward first');
+      setSnackbarOpen(true);
+      return;
+    }
     try {
       // Update patient record in Supabase
       const { data, error } = await supabase
@@ -139,6 +178,17 @@ function Main() {
 
   const handleWardChange = async (patientId, selectedWard) => {
     try {
+      // Check if the selected ward is already at full capacity
+      const currentWardPatients = patients.filter(patient => patient.ward_num === selectedWard).length;
+      const maxCapacity = wardCapacities[selectedWard] || 0;
+
+      if (currentWardPatients >= maxCapacity) {
+        const message = `Ward ${selectedWard} is already at full capacity.`;
+        setSnackbarMessage(message);
+        setSnackbarOpen(true);
+        return; // Exit function if ward is at full capacity
+      }
+
       const updatedPatients = waitingList.map(patient => {
         if (patient.patient_id === patientId) {
           return { ...patient, ward_num: selectedWard };
@@ -164,6 +214,13 @@ function Main() {
 
   const outPatients = patients.filter(patient => patient.out_patient);
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   return (
     <>
       <Grid container spacing={2}>
@@ -179,10 +236,21 @@ function Main() {
         </Grid>
         <Grid item xs={4}>
           <Paper sx={{ p: 4 }}>
-            <Typography variant="h1" sx={{ fontSize: '60px', textAlign: 'center', marginTop: 7, fontWeight: 700 }}>
-              {remainingCapacity}
+            <Typography variant="h1" sx={{ 
+              fontSize: '60px',
+              textAlign: 'center',
+              marginTop: 7,
+              fontWeight: 700,
+              color: remainingCapacity === 0 ? 'rgb(120, 231, 120)' : 'inherit'
+            }}>
+              {remainingCapacity === 0 ? "There's no bed for you today" : remainingCapacity}
             </Typography>
-            <Typography variant="h1" sx={{ fontSize: '30px', textAlign: 'center', backgroundColor: 'rgb(120, 231, 120)', marginTop: 7 }}>
+            <Typography variant="h1" sx={{ 
+              fontSize: '30px',
+              textAlign: 'center',
+              backgroundColor: 'rgb(120, 231, 120)',
+              marginTop: 7
+            }}>
               BED CAPACITY
             </Typography>
           </Paper>
@@ -236,18 +304,23 @@ function Main() {
                   ) : (
                     // Display buttons for IN patients and dropdown for ward selection
                     <>
-                      <Button onClick={() => handleInPatient(patient.patient_id)} variant="contained" color="primary" sx={{ marginRight: 1, marginTop: 1}}>
+                      <Button
+                        onClick={() => handleInPatient(patient.patient_id)}
+                        variant="contained"
+                        color="primary"
+                        sx={{ marginRight: 1, marginTop: 1 }}
+                      >
                         IN
                       </Button>
                       {/* Dropdown for ward selection */}
-                      <FormControl sx={{ minWidth: 120 }}>
+                      <FormControl sx={{ minWidth: 100 }}>
                         <InputLabel>Ward</InputLabel>
                         <Select
                           value={patient.ward_num || ''}
                           onChange={(e) => handleWardChange(patient.patient_id, e.target.value)}
                         >
-                          {[...Array(17).keys()].map(num => (
-                            <MenuItem key={num + 1} value={num + 1}>{`Ward ${num + 1}`}</MenuItem>
+                          {wardNames.map((name, index) => (
+                            <MenuItem key={index + 1} value={index + 1}>{`Ward ${index + 1} ${name}`}</MenuItem>
                           ))}
                         </Select>
                       </FormControl>
@@ -326,6 +399,17 @@ function Main() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%', fontSize: 18 }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
     </>
   );

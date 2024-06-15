@@ -16,7 +16,7 @@ export default function AddSupply() {
         Category: '',
         Price: '',
         Quantity: '',
-        Expiration_Date: null
+        Expiration_Date: null // Start with Expiration_Date as null
     });
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function AddSupply() {
     const handleDateChange = (date) => {
         setNewSupply({
             ...newSupply,
-            Expiration_Date: date // Ensure Expiration_Date is set to a Date object
+            Expiration_Date: date // Ensure Expiration_Date is set to a Date object or null
         });
     };
 
@@ -43,9 +43,9 @@ export default function AddSupply() {
     };
 
     const addSupply = async () => {
-        // Check if any field is empty
+        // Check if any required field is empty
         for (let key in newSupply) {
-            if (!newSupply[key]) {
+            if (key !== 'Expiration_Date' && !newSupply[key]) {
                 setSnackbarSeverity('error');
                 setSnackbarMessage('Fill in all the fields.');
                 setSnackbarOpen(true);
@@ -108,6 +108,7 @@ export default function AddSupply() {
                     value={newSupply.Supplies_name}
                     onChange={handleInputChange}
                     sx={{ marginBottom: 2 }}
+                    required
                 />
                 <TextField
                     fullWidth
@@ -117,6 +118,7 @@ export default function AddSupply() {
                     value={newSupply.Description}
                     onChange={handleInputChange}
                     sx={{ marginBottom: 2 }}
+                    required
                 />
                 <TextField
                     fullWidth
@@ -126,6 +128,7 @@ export default function AddSupply() {
                     value={newSupply.Category}
                     onChange={handleInputChange}
                     sx={{ marginBottom: 2 }}
+                    required
                 />
                 <TextField
                     fullWidth
@@ -136,6 +139,7 @@ export default function AddSupply() {
                     value={newSupply.Price}
                     onChange={handleInputChange}
                     sx={{ marginBottom: 2 }}
+                    required
                 />
                 <TextField
                     fullWidth
@@ -146,26 +150,27 @@ export default function AddSupply() {
                     value={newSupply.Quantity}
                     onChange={handleInputChange}
                     sx={{ marginBottom: 2 }}
+                    required
                 />
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={6}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                            fullWidth
-                            label="Expiration Date"
-                            value={newSupply.Expiration_Date}
-                            onChange={handleDateChange}
-                            textField={<TextField variant="outlined" />}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 5,
-                                },
-                            }}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </LocalizationProvider>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                fullWidth
+                                label="Expiration Date"
+                                value={newSupply.Expiration_Date}
+                                onChange={handleDateChange}
+                                textField={<TextField variant="outlined" />}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 5,
+                                    },
+                                }}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                        </LocalizationProvider>
                     </Grid>
                     <Grid item xs={6}>
                         <Button

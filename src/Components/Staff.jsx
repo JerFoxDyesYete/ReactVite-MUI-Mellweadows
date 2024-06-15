@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Snackbar, Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import supabase from '../Services/Supabase';
 import SearchBarStaff from './SearchBarStaff';
 
@@ -7,6 +9,8 @@ function Staff() {
     const [staffs, setStaffs] = useState([]);
     const [filteredStaffs, setFilteredStaffs] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [staffToDelete, setStaffToDelete] = useState(null);
 
     useEffect(() => {
         fetchStaffs();
@@ -31,8 +35,7 @@ function Staff() {
 
     useEffect(() => {
         const filteredResults = staffs.filter(staff =>
-            staff.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            staff.lastname.toLowerCase().includes(searchTerm.toLowerCase())
+          `${staff.firstname} ${staff.lastname}`.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredStaffs(filteredResults);
     }, [searchTerm, staffs]);
@@ -64,9 +67,43 @@ function Staff() {
         }
     };
 
+    const handleDeleteStaff = (staffId) => {
+        setStaffToDelete(staffId);
+        setSnackbarOpen(true);
+    };
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbarOpen(false);
+        setStaffToDelete(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            const { error } = await supabase
+                .from('Staff')
+                .delete()
+                .eq('id', staffToDelete);
+
+            if (error) {
+                throw error;
+            }
+
+            setFilteredStaffs(prevStaffs => prevStaffs.filter(staff => staff.id !== staffToDelete));
+        } catch (error) {
+            console.error(`Error deleting staff ${staffToDelete}:`, error.message);
+        } finally {
+            setSnackbarOpen(false);
+            setStaffToDelete(null);
+        }
+    };
+    
+
     return (
         <>
-            <SearchBarStaff onSearchChange={handleSearchChange} />
+            <SearchBarStaff onSearchChange={handleSearchChange} patients={staffs} />
 
             <TableContainer component={Paper} sx={{ marginTop: 2, maxHeight: '70vh', overflow: 'auto' }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -81,6 +118,7 @@ function Staff() {
                             <TableCell align="center">NIN Number</TableCell>
                             <TableCell align="center">Current Ward</TableCell>
                             <TableCell align="center">Ward Selector</TableCell>
+                            <TableCell align="center">Delete Staff(s)</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -110,11 +148,51 @@ function Staff() {
                                         ))}
                                     </Select>
                                 </TableCell>
+                                <TableCell align="center">
+                                    <IconButton
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handleDeleteStaff(staff.id)}
+                                    >
+                                        <DeleteIcon/>
+                                    </IconButton>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                message="Are you sure you want to delete this patient?"
+                action={
+                <>
+                    <Button
+                    color="secondary"
+                    size="small"
+                    onClick={handleCloseSnackbar}
+                    style={{ fontWeight: 'bold' }}
+                    >
+                    No
+                    </Button>
+                    <Button
+                    color="primary"
+                    size="small"
+                    onClick={handleConfirmDelete}
+                    style={{ fontWeight: 'bold' }}
+                    >
+                    Yes
+                    </Button>
+                </>
+                }
+                anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+                }}
+            />
         </>
     );
 }

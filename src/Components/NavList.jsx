@@ -35,9 +35,17 @@ export const mainListItems = (
         <Link to="/dashboard/patientsmain" style={styles}>
             <ListItemButton>
                 <ListItemIcon>
-                <AccessibleIcon />
+                    <AccessibleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Patient Management" />
+            </ListItemButton>
+        </Link>
+        <Link to="/dashboard/patientmedication" style={styles}>
+            <ListItemButton>
+                <ListItemIcon>
+                    <MedicationIcon />
+                </ListItemIcon>
+                <ListItemText primary="Patient Medication" />
             </ListItemButton>
         </Link>
         <Link to="/dashboard/staff" style={styles}>
@@ -61,7 +69,7 @@ export const mainListItems = (
                 <ListItemIcon>
                     <AddTaskIcon />
                 </ListItemIcon>
-                <ListItemText primary="Supply Management" />
+                <ListItemText primary="Add Supply" />
             </ListItemButton>
         </Link>
         <Link to="/dashboard/supplylist" style={styles}>

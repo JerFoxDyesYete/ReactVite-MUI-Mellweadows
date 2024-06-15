@@ -12,6 +12,9 @@ function Ward() {
     const [patients, setPatients] = useState([]);
     const [staff, setStaff] = useState([]);
     const [selectedWard, setSelectedWard] = useState(null);
+    const [medicationRecords, setMedicationRecords] = useState([]);
+    const [supplies, setSupplies] = useState([]);
+    const [isFullCapacity, setIsFullCapacity] = useState(false); // State to track full capacity
 
     // Define ward bed limits
     const wardBedLimits = {
@@ -24,7 +27,41 @@ function Ward() {
     useEffect(() => {
         fetchPatients();
         fetchStaff();
+        fetchMedicationRecords();
+        fetchSupplies();
     }, []);
+
+    const fetchMedicationRecords = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('MedicationRecords')
+            .select('*');
+      
+          if (error) {
+            throw error;
+          }
+      
+          setMedicationRecords(data);
+        } catch (error) {
+          console.error('Error fetching medication records:', error.message);
+        }
+    };
+
+    const fetchSupplies = async () => {
+        try {
+            const { data, error } = await supabase
+            .from('Supplies')
+            .select('id, Supplies_name');
+        
+            if (error) {
+            throw error;
+            }
+        
+            setSupplies(data);
+        } catch (error) {
+            console.error('Error fetching supplies:', error.message);
+        }
+    };
 
     const fetchPatients = async () => {
         try {
@@ -60,6 +97,7 @@ function Ward() {
 
     const handleWardButtonClick = (wardNum) => {
         setSelectedWard(wardNum);
+        setIsFullCapacity(false); // Reset full capacity status when switching wards
     };
 
     const countPatientsInWard = (wardNum) => {
@@ -147,15 +185,17 @@ function Ward() {
                                     <TableCell align="center">Address</TableCell>
                                     <TableCell align="center">Birthdate</TableCell>
                                     <TableCell align="center">Marital Status</TableCell>
-                                    <TableCell align="center">Telephone Number</TableCell>
-                                    <TableCell align="center">Date Registered</TableCell>
-                                    <TableCell align="center">Ward</TableCell>
+                                    <TableCell align="center">Cellphone Number</TableCell>
+                                    <TableCell align="center">Date Expected Leave</TableCell>
                                     <TableCell align="center">Staff Name</TableCell>
+                                    <TableCell align="center" style={{ minWidth: '150px' }}>Patient Medication</TableCell>
+                                    <TableCell align="center">Quantity</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {patients.filter(patient => patient.ward_num === selectedWard).map(patient => {
                                     const assignedStaff = staff.find(staffMember => staffMember.ward_num === patient.ward_num);
+                                    const patientMedicationRecords = medicationRecords.filter(record => record.patient_id === patient.patient_id);
                                     return (
                                         <TableRow key={patient.patient_id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                             <TableCell align="center">{patient.firstname} {patient.lastname}</TableCell>
@@ -164,8 +204,7 @@ function Ward() {
                                             <TableCell align="center">{patient.date_of_birth}</TableCell>
                                             <TableCell align="center">{patient.marital_status}</TableCell>
                                             <TableCell align="center">{patient.cellphone_number}</TableCell>
-                                            <TableCell align="center">{patient.date_registered}</TableCell>
-                                            <TableCell align="center">{patient.ward_num}</TableCell>
+                                            <TableCell align="center">{patient.date_expected_leave}</TableCell>
                                             <TableCell align="center" style={{ minWidth: '200px' }}>
                                                 {getStaffForWard(selectedWard).length > 0 ? (
                                                     <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
@@ -178,6 +217,30 @@ function Ward() {
                                                     </ul>
                                                 ) : (
                                                     'No Assigned Staff'
+                                                )}
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                {patientMedicationRecords.length > 0 ? (
+                                                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+                                                    {patientMedicationRecords.map(record => (
+                                                        <li key={record.id}>
+                                                        {supplies.find(supply => supply.id === record.supply_id)?.Supplies_name}
+                                                        </li>
+                                                    ))}
+                                                    </ul>
+                                                ) : (
+                                                    'No Medication Records'
+                                                )}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                {patientMedicationRecords.length > 0 ? (
+                                                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+                                                    {patientMedicationRecords.map(record => (
+                                                        <li key={record.id}>{record.quantity}</li>
+                                                    ))}
+                                                    </ul>
+                                                ) : (
+                                                    '-'
                                                 )}
                                                 </TableCell>
                                         </TableRow>

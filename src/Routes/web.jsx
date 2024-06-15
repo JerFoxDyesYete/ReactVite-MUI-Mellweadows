@@ -11,6 +11,7 @@ import Supply from '../Components/Supply';
 import PatientMain from '../Components/PatientMain';
 import WebPage from '../Pages/WebPage';
 import AddSupply from '../Components/AddSupply';
+import MedicationForm from '../Components/MedicationForm';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
         {
           path: 'patientsmain',
           element: <PatientMain/>
+        },
+        {
+          path: 'patientmedication',
+          element: <MedicationForm/>
         },
         {
             path: "staff",
