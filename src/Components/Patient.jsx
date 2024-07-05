@@ -16,7 +16,6 @@ function Patient() {
   const [datePlaceWaiting, setDatePlaceWaiting] = useState(null);
   const [datePlaceWard, setDatePlaceWard] = useState(null);
   const [dateExpectedLeave, setDateExpectedLeave] = useState(null);
-
   const [snackbarOpen, setSnackbarOpen] = useState(false); // State for Snackbar visibility
   const [snackbarMessage, setSnackbarMessage] = useState(''); // State for Snackbar message
   const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'error', 'success', etc.
